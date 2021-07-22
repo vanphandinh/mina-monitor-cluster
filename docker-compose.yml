@@ -1,0 +1,20 @@
+version: "3.9"
+
+services:
+  mina-monitor-cluster:
+    container_name: mina-monitor-cluster 
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "2222:2222"
+    image: mina-monitor-cluster
+    restart: unless-stopped
+    pid: host
+    networks:
+      - mina-monitor-cluster
+
+networks:
+  mina-monitor-cluster:
+    name: mina-monitor-cluster
+    driver: bridge
