@@ -4,7 +4,7 @@ import "../css/index.less"
 import "../vendor/metro4/js/metro"
 import "../vendor/chart/chart"
 import {messages as Messages} from "./helpers/messages"
-import {title, version} from "./helpers/consts"
+import {title} from "./helpers/consts"
 import {nodeController} from "./node-controller";
 import {getPrice} from "./price";
 import {getConsensus} from "./consensus";
@@ -17,6 +17,8 @@ import {getRewards} from "./rewards";
 import {getExplorerSummary} from "./explorer";
 import {getNextBlock} from "./next-block";
 import {copy2clipboard} from "./helpers/utils";
+
+const version = `1.0.3`
 
 globalThis.Monitor = {
     config: null,
@@ -40,7 +42,9 @@ globalThis.Monitor = {
 $("title").text(title.replace('%VER%', version))
 $("#version").text(version)
 
-fetch("./config.json").then(r => {
+const configFile = "./config.one.json"
+
+fetch(configFile).then(r => {
     if (!r.ok) {
         throw new Error(Messages.CONFIG_READ_ERROR)
     }
@@ -79,7 +83,10 @@ fetch("./config.json").then(r => {
     const nodesLength = config.nodes.length
 
     $.each(config.nodes, (i, node) => {
-        elNodesContainer.append($(`<div class='is-node' id='node-${i+1}'>`).addClass(nodesLength === 3 ? 'cell-lg-4' : nodesLength === 2 ? 'cell-lg-6' : 'cell-lg-12'))
+        elNodesContainer.append(
+            $(`<div class='is-node' id='node-${i+1}'>`)
+                .addClass(nodesLength === 3 ? 'cell-lg-4' : nodesLength === 2 ? 'cell-lg-6' : 'cell-lg-12')
+        )
         globalThis.Monitor.nodes[i] = {}
         globalThis.Monitor.charts.push({
             memoryChart: null,

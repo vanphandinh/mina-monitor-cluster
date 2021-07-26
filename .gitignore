@@ -5,4 +5,5 @@ build
 node_modules
 coverage
 *.log
-src/config.json
+config*.json
+!config.example.json
