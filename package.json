@@ -1,6 +1,6 @@
 {
     "name": "@olton/mina-monitor-cluster",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "license": "MIT",
     "scripts": {
         "start": "shx rm -rf .output/* && parcel serve ./src/index.html --out-dir .output --target browser -p 2222",
@@ -10,12 +10,16 @@
     "devDependencies": {
         "less": "^4.1.1",
         "parcel-bundler": "^1.12.5",
+        "parcel-plugin-html-partials": "^0.0.6",
         "parcel-plugin-static-files-copy": "^2.6.0",
         "shx": "^0.3.3"
     },
     "staticFiles": {
         "staticPath": [
             "src/config.json",
+            "src/config.one.json",
+            "src/config.one.local.json",
+            "src/config.two.json",
             "src/.htaccess"
         ]
     },

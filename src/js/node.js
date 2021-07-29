@@ -13,26 +13,48 @@ export const getNodeStatus = async (index, node) => {
     const elNodeMaxHeight = elNode.find(".max-block")
     const elNodeUnvHeight = elNode.find(".max-unvalidated")
     const elNodeExpHeight = elNode.find(".explorer-height")
-    const elProducerCount = $(".producer-count")
-    const elProducerFirst = $(".producer-first")
-    const elSnarkFee = $(".snark-fee")
-    const elSnarkAddress = $(".snark-address")
     const elPeersCount = elNode.find(".peers-count")
     const elLog = elNode.find(".node-load-status")
     const elNodeInfoGeneral = elNode.find(".node-info-general")
     const elNodeHealth = elNode.find(".node-health")
-
-    // elLog.html(imgStop)
+    const elNodeResponseTime = elNode.find(".node-response-time")
+    const elNodeBlockProducer = elNode.find(".block-producer")
+    const elNodeSnarkWorker = elNode.find(".snark-worker")
+    const elNodeSnarkWorkerFee = elNode.find(".snark-worker-fee")
+    const elNodeHealthContainer = elNode.find(".node-health-container")
+    const elProducerCog = elNode.find(".producer-work")
+    const elSnarkWorkerCog = elNode.find(".snark-worker-work")
 
     let health = await getInfo(node, 'health')
     let status = await getInfo(node, 'node-status')
+    let responseTime = await getInfo(node, 'node-response-time')
+
+    if (isNaN(responseTime)) {
+        responseTime = 0
+    }
+
+    responseTime /= 1000
+
+    elNodeResponseTime.removeClass("alert success warning")
+    elNodeResponseTime.html(responseTime.toFixed(2) + "s")
+    if (responseTime <= 1) {
+        elNodeResponseTime.addClass("success")
+    }
+    if (Metro.utils.between(responseTime, 1, 10)) {
+        elNodeResponseTime.addClass("warning")
+    }
+    if (responseTime >= 10) {
+        elNodeResponseTime.addClass("alert")
+    }
 
     elNodeInfoGeneral.removeClass("bg-alert")
+    elNodeHealthContainer.removeClass("warning")
     if (health) {
         if (health.length) {
             elLog.html(imgStop)
             elNodeInfoGeneral.addClass("bg-alert")
             elNodeHealth.html($("<span>").addClass("label-alert").html(health.join(", ")))
+            elNodeHealthContainer.addClass("warning")
         } else {
             elLog.html(imgOk)
             elNodeHealth.html($("<span>").addClass("label-success").html("OK"))
@@ -42,6 +64,8 @@ export const getNodeStatus = async (index, node) => {
     }
 
     elNode.removeClass("CATCHUP SYNCED BOOTSTRAP OFFLINE CONNECTING UNKNOWN")
+    elProducerCog.removeClass("ani-spin")
+    elSnarkWorkerCog.removeClass("ani-spin")
 
     if (status) {
         const node = status.data
@@ -137,17 +161,26 @@ export const getNodeStatus = async (index, node) => {
             }
         }
 
-        elProducerFirst.clear()
-
         if (blockProductionKeys && blockProductionKeys.length) {
-            elProducerCount.html(blockProductionKeys.length)
-            elProducerFirst.html(shortAddress(blockProductionKeys[0])).attr("title", blockProductionKeys[0])
+            elProducerCog.addClass("ani-spin")
+            elNodeBlockProducer
+                .html(shortAddress(blockProductionKeys[0]))
+                .attr("title", blockProductionKeys[0])
+                .attr("data-name", blockProductionKeys[0])
         } else {
-            elProducerCount.html("NONE")
+            elNodeBlockProducer.html("NONE")
         }
 
-        elSnarkFee.html(snarkWorkFee / 10**9)
-        elSnarkAddress.html(snarkWorker ? shortAddress(snarkWorker) : "NONE").attr("title", snarkWorker ? snarkWorker : "")
+        if (snarkWorker) {
+            elSnarkWorkerCog.addClass("ani-spin")
+            elNodeSnarkWorker
+                .html(shortAddress(snarkWorker))
+                .attr("data-name", snarkWorker)
+        } else {
+            elNodeSnarkWorker.html("NONE")
+        }
+
+        elNodeSnarkWorkerFee.html(snarkWorkFee / 10**9)
 
         globalThis.Monitor.charts[index].peersChartStartPoint += 10
         globalThis.Monitor.charts[index].peersChart.add(0, [globalThis.Monitor.charts[index].peersChartStartPoint - 10, globalThis.Monitor.charts[index].peersChartStartPoint, peers.length], true)
